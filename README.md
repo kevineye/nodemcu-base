@@ -1,6 +1,6 @@
-# NodeMCU MQTT Base
+# NodeMCU Lib
 
-Base project for MQTT-controlled NodeMCU IoT device.
+Libraries for NodeMCU IoT devices.
 
 Overall NodeMCU docs:
 
@@ -27,6 +27,16 @@ Build the firmware using the [NodeMCU cloud build service](https://nodemcu-build
   * WiFi (default)
 
 Download the "float" version of the build.
+
+Or, build with docker:
+
+    git clone https://github.com/nodemcu/nodemcu-firmware.git
+    cd nodemcu-firmware
+    # edit app/include/user_modules.h to select modules to build (see above)
+    docker pull marcelstoer/nodemcu-build
+    docker run --rm -ti -e FLOAT_ONLY=1 -v `pwd`:/opt/nodemcu-firmware marcelstoer/nodemcu-build
+    
+Firmware is output in `bin/nodemcu_float_master_*.bin`
  
 ### Upload firmware (serial)
 
@@ -75,24 +85,3 @@ These commands only work if a telnet server is running on the device. If the dev
 careful not to upload code (such as a broken init.lua) that will fail to connect to wifi, have an error before running 
 the telnet server or reboot without allowing time to send some commands.
 
-
-## Operation
-
-The device will connect to WiFi and MQTT with the settings in config.json. Make sure these are correct before transferring to the device.
-
-### Feedback
-
-When powered on, the LED will give three quick flashes every three seconds until it is successfully connected to WiFi and MQTT.
-
-### MQTT
-
-The device will subscribe and publish with a configurable root path, called "/esp" below, for basic status and configuration.
-
-| Topic                   | Pub/Sub   | Payload   | Description |
-|-------------------------|-----------|-----------|-------------|
-| `/esp/ping`             | subscribe | *any*     | Triggers publishing status message. |
-| `/esp/status`           | publish   | *JSON*    | Status info is published at connect and retained. Contains IP address and other info. Marked offline when device is not connected. Retained. |
-| `/esp/config`           | subscribe | key=value | Persistently sets a configuration value in config.json. |
-| `/esp/config`           | subscribe | ping      | Triggers publishing config JSON dump. |
-| `/esp/config`           | subscribe | restart   | Restarts the device. |
-| `/esp/config/json`      | publish   | *JSON*    | Configuration values (initially from config.json) are dumped in response to config ping. |
