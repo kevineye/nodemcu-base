@@ -8,5 +8,7 @@
   "mqtt_user": "-",
   "mqtt_password": "-",
   "tz_offset": -5.0,
-  "ifttt_key": ""
+  "ifttt_key": "",
+  "zone": 0,
+  "temp_offset": -5.5
 }

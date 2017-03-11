@@ -28,6 +28,7 @@ if bme280 ~= nil and sensors.BME280_PIN_SCL and sensors.BME280_PIN_SDA then
     temp = bme280.temp()
     if temp ~= nil then
         temp = temp * 9 / 500 + 32;
+        temp = temp + sensors.temp_offset;
     else
         temp = sensors._avg_temp
     end
@@ -41,6 +42,7 @@ if dht ~= nil and sensors.DHT_PIN then
         humi = sensors._avg_humi
     else
         temp = temp * 9 / 5 + 32;
+        temp = temp + sensors.temp_offset;
     end
 end
 
