@@ -47,7 +47,7 @@ if dht ~= nil and sensors.DHT_PIN then
 end
 
 if adc ~= nil and sensors.LIGHT_PIN then
-    light = adc.read(sensors.LIGHT_PIN) / 3.5
+    light = adc.read(sensors.LIGHT_PIN) / 10.24
 end
 
 sensors._avg_temp = sensors._avg_temp + (temp  - sensors._avg_temp) / sensors._sample_count
