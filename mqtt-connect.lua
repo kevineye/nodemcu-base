@@ -38,7 +38,7 @@ m.client:on("message", function(client, t, pl)
     if pl == nil then pl = "" end
     log.log(7, MODULE, "received " .. t .. ": " .. pl)
     if (t == m.prefix .. "/ping") then
-        sendstatus()
+        m.send_status()
     elseif config ~= nil and t == m.prefix .. "/config" then
         if (pl == "ping") then
             local msg = cjson.encode(config.get())
