@@ -10,5 +10,7 @@
   "tz_offset": -5.0,
   "ifttt_key": "",
   "zone": 0,
-  "temp_offset": -5.5
+  "temp_offset": 0,
+  "switch_delay": 10,
+  "light_threshold": 50
 }

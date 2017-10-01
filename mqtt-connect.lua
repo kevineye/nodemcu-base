@@ -10,6 +10,9 @@ m.password          = config.get('mqtt_password')
 m.prefix            = config.get('mqtt_prefix')
 m.host              = config.get('mqtt_host')
 m.port              = config.get('mqtt_port')
+m.connected         = false
+m.connectCb         = {}
+m.messageCb         = {}
 
 if ready ~= nil then ready = ready + 1 end
 
@@ -22,15 +25,20 @@ function m.send_status()
     m.client:publish(m.prefix .. "/status", msg, 0, 1)
 end
 
-m.client:on("connect", function()
+m.client:on("connect", function(client)
+    m.connected = true
     log.log(5, MODULE, 'connected to ' .. m.host .. ':' .. m.port)
     if ready ~= nil then ready = ready - 1 end
     m.client:subscribe(m.prefix .. "/ping", 0)
     m.client:subscribe(m.prefix .. "/config", 0)
     m.send_status()
+    for index,value in ipairs(m.connectCb) do
+        value(client)
+    end
 end)
 
 m.client:on("offline", function()
+    m.connected = false
     log.log(1, MODULE, 'disconnected')
 end)
 
@@ -49,8 +57,23 @@ m.client:on("message", function(client, t, pl)
         else
             config.set_string(pl)
         end
+    else
+        for index,value in ipairs(m.messageCb) do
+            value(client, t, pl)
+        end
     end
 end)
+
+function m.onConnect(cb)
+    table.insert(m.connectCb, cb)
+    if m.connected == true then
+        cb(m.client)
+    end
+end
+
+function m.onMessage(cb)
+    table.insert(m.messageCb, cb)
+end
 
 if m.STATUS_INTERVAL > 0 then
     tmr.alarm(m.TIMER, m.STATUS_INTERVAL, tmr.ALARM_AUTO, m.send_status)
