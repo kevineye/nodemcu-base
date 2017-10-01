@@ -9,6 +9,7 @@ sensors.BME280_PIN_SCL      = 1
 sensors.BME280_PIN_SDA      = 2
 sensors.DHT_PIN             = nil
 sensors.LIGHT_PIN           = nil
+sensors.LIGHT_REVERSE       = true
 
 sensors.zone                = config.get('zone')
 sensors.temp_offset         = config.get('temp_offset')

@@ -48,6 +48,7 @@ end
 
 if adc ~= nil and sensors.LIGHT_PIN then
     light = adc.read(sensors.LIGHT_PIN) / 10.24
+    if sensors.LIGHT_REVERSE then light = 100 - light end
 end
 
 sensors._avg_temp = sensors._avg_temp + (temp  - sensors._avg_temp) / sensors._sample_count
