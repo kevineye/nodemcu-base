@@ -10,7 +10,10 @@ w.connect = function(cb)
     log.log(5, MODULE, 'connecting to ' .. w.ssid .. '...')
     if ready ~= nil then ready = ready + 1 end
     wifi.setmode(wifi.STATION)
-    wifi.sta.config(w.ssid, w.password)
+    local station = {}
+    station.ssid = w.ssid
+    station.pwd = w.password
+    wifi.sta.config(station)
     tmr.alarm(w.TIMER, 1000, tmr.ALARM_AUTO, function()
         if wifi.sta.getip() == nil then
             log.log(9, MODULE, 'waiting for IP address...')
