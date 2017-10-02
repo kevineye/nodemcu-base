@@ -3,6 +3,7 @@ local log = require 'log'
 
 local m = {}
 m.STATUS_INTERVAL   = 5 * 60000
+m.RECONNECT_DELAY   = 10 * 1000
 m.clientid          = config.get('mqtt_clientid')
 m.user              = config.get('mqtt_user')
 m.password          = config.get('mqtt_password')
@@ -15,6 +16,10 @@ m.messageCb         = {}
 
 if ready ~= nil then ready = ready + 1 end
 
+function m.onError(_, _)
+    tmr.create():alarm(m.RECONNECT_DELAY, tmr.ALARM_SINGLE, m.connect)
+end
+
 m.client = mqtt.Client(m.clientid, 60, m.user, m.password)
 m.client:lwt(m.prefix .. "/status", '{"status":"offline"}', 0, 1)
 
@@ -24,7 +29,7 @@ function m.send_status()
     m.client:publish(m.prefix .. "/status", msg, 0, 1)
 end
 
-m.client:on("connect", function(client)
+function m.onConnected(client)
     m.connected = true
     log.log(5, MODULE, 'connected to ' .. m.host .. ':' .. m.port)
     if ready ~= nil then ready = ready - 1 end
@@ -34,7 +39,7 @@ m.client:on("connect", function(client)
     for _, value in ipairs(m.connectCb) do
         value(client)
     end
-end)
+end
 
 m.client:on("offline", function()
     m.connected = false
@@ -78,7 +83,10 @@ if m.STATUS_INTERVAL > 0 then
     tmr.create():alarm(m.STATUS_INTERVAL, tmr.ALARM_AUTO, m.send_status)
 end
 
-log.log(9, MODULE, 'connecting to ' .. m.host .. ':' .. m.port)
-m.client:connect(m.host, m.port, 0, 1)
+function m.connect()
+    log.log(9, MODULE, 'connecting to ' .. m.host .. ':' .. m.port)
+    m.client:connect(m.host, m.port, m.onConnected, m.onError)
+end
+m.connect()
 
 return m
