@@ -15,6 +15,8 @@ log.log = function(level, module, message)
     if ts then
         local tm = rtctime.epoch2cal(ts)
         s = string.format("%02d:%02d:%02d", tm["hour"], tm["min"], tm["sec"])
+    else
+        s = ''
     end
 
     if log.heap then
