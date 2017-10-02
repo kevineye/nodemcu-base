@@ -23,7 +23,7 @@ function saw_motion()
     m.client:publish(m.prefix .. "/motion", msg, 0, 0)
     local delay = config.get('switch_delay')
     local light_t = config.get('light_threshold')
-    if (delay >= 0 and sensors._avg_light < light_t) or motion.delay_set then
+    if (delay >= 0 and sensors.light < light_t) or motion.delay_set then
         if motion.moving then
             switch_relay(true)
         else
