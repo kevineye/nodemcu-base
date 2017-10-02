@@ -10,7 +10,7 @@ if ready ~= nil then ready = ready + 1 end
 function config.read_json()
     log.log(7, MODULE, 'loading config from ' .. config.filename)
     file.open(config.filename, "r")
-    config.data = cjson.decode(file.read())
+    config.data = sjson.decode(file.read())
     file.close()
     if ready ~= nil then ready = ready - 1 end
 end
@@ -39,7 +39,7 @@ end
 function config.save_json()
     file.remove(config.filename)
     file.open(config.filename, "w")
-    file.write(cjson.encode(config.data))
+    file.write(sjson.encode(config.data))
     file.close()
 end
 

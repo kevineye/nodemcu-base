@@ -32,7 +32,7 @@ m.client:on("connect", function(client)
     m.client:subscribe(m.prefix .. "/ping", 0)
     m.client:subscribe(m.prefix .. "/config", 0)
     m.send_status()
-    for index,value in ipairs(m.connectCb) do
+    for _, value in ipairs(m.connectCb) do
         value(client)
     end
 end)
@@ -49,7 +49,7 @@ m.client:on("message", function(client, t, pl)
         m.send_status()
     elseif config ~= nil and t == m.prefix .. "/config" then
         if (pl == "ping") then
-            local msg = cjson.encode(config.get())
+            local msg = sjson.encode(config.get())
             log.log(7, MODULE, "sending " .. m.prefix .. "/config/json: " .. msg)
             m.client:publish(m.prefix .. "/config/json", msg, 0, 0)
         elseif (pl == "restart") then
@@ -58,7 +58,7 @@ m.client:on("message", function(client, t, pl)
             config.set_string(pl)
         end
     else
-        for index,value in ipairs(m.messageCb) do
+        for _, value in ipairs(m.messageCb) do
             value(client, t, pl)
         end
     end
