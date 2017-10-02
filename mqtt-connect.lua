@@ -2,7 +2,6 @@ local MODULE = 'mqtt'
 local log = require 'log'
 
 local m = {}
-m.TIMER             = 3
 m.STATUS_INTERVAL   = 5 * 60000
 m.clientid          = config.get('mqtt_clientid')
 m.user              = config.get('mqtt_user')
@@ -76,7 +75,7 @@ function m.onMessage(cb)
 end
 
 if m.STATUS_INTERVAL > 0 then
-    tmr.alarm(m.TIMER, m.STATUS_INTERVAL, tmr.ALARM_AUTO, m.send_status)
+    tmr.create():alarm(m.STATUS_INTERVAL, tmr.ALARM_AUTO, m.send_status)
 end
 
 log.log(9, MODULE, 'connecting to ' .. m.host .. ':' .. m.port)

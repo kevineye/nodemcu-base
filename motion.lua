@@ -1,6 +1,7 @@
 local MODULE = 'motion'
 local m = require 'mqtt-connect'
 local log = require 'log'
+local timer = tmr.create()
 
 motion = {}
 
@@ -9,8 +10,6 @@ motion.MOTION_PIN           = 6
 
 motion.moving               = false
 motion.relay                = false
-
-motion.TIMER                = 6
 motion.delay_set            = false
 
 gpio.mode(motion.MOTION_PIN, gpio.INT, gpio.FLOAT)
@@ -46,7 +45,7 @@ end
 function switch_delay_clear()
     if motion.delay_set then
         log.log(7, MODULE, "canceing delayed switch off")
-        tmr.stop(motion.TIMER)
+        timer:stop()
         motion.delay_set = false
     end
 end
@@ -54,7 +53,7 @@ end
 function switch_delay_off(delay)
     switch_delay_clear()
     log.log(7, MODULE, "switching off in " .. delay .. " seconds")
-    tmr.alarm(motion.TIMER, delay * 1000, tmr.ALARM_AUTO, function()
+    timer.alarm(delay * 1000, tmr.ALARM_SINGLE, function()
         switch_relay(false)
     end)
 end
