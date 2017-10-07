@@ -11,6 +11,7 @@ w.connect = function(cb)
     log.log(5, MODULE, 'connecting to ' .. w.ssid .. '...')
     if ready ~= nil then ready = ready + 1 end
     wifi.setmode(wifi.STATION)
+    wifi.sta.sethostname(config.data['hostname']);
     local station = {}
     station.ssid = w.ssid
     station.pwd = w.password
@@ -22,6 +23,7 @@ w.connect = function(cb)
             timer:stop()
             log.log(5, MODULE, 'wifi connection established')
             log.log(5, MODULE, 'IP address is ' .. wifi.sta.getip())
+            log.log(5, MODULE, 'hostname is ' .. wifi.sta.gethostname())
             if cb ~= nil then cb() end
             if ready ~= nil then ready = ready - 1 end
         end
