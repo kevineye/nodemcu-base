@@ -1,10 +1,11 @@
 local MODULE = 'wifi'
 local log = require 'log'
+local config = require 'config'
 local timer = tmr.create()
 
 local w = {}
-w.ssid      = config.get('wifi_ssid')
-w.password  = config.get('wifi_password')
+w.ssid      = config.data['wifi_ssid']
+w.password  = config.data['wifi_password']
 
 w.connect = function(cb)
     log.log(5, MODULE, 'connecting to ' .. w.ssid .. '...')

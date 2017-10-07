@@ -1,15 +1,11 @@
 local MODULE = 'mqtt'
 local log = require 'log'
+local config = require 'config'
 
 local m = {}
 m.STATUS_INTERVAL   = 5 * 60000
 m.RECONNECT_DELAY   = 10 * 1000
-m.clientid          = config.get('mqtt_clientid')
-m.user              = config.get('mqtt_user')
-m.password          = config.get('mqtt_password')
-m.prefix            = config.get('mqtt_prefix')
-m.host              = config.get('mqtt_host')
-m.port              = config.get('mqtt_port')
+m.prefix            = config.data['mqtt_prefix']
 m.connected         = false
 m.connectCb         = {}
 m.messageCb         = {}
@@ -20,7 +16,7 @@ function m.onError(_, _)
     tmr.create():alarm(m.RECONNECT_DELAY, tmr.ALARM_SINGLE, m.connect)
 end
 
-m.client = mqtt.Client(m.clientid, 60, m.user, m.password)
+m.client = mqtt.Client(config.data['mqtt_clientid'], 60, config.data['mqtt_user'], config.data['mqtt_password'])
 m.client:lwt(m.prefix .. "/status", '{"status":"offline"}', 0, 1)
 
 function m.send_status()
@@ -31,7 +27,7 @@ end
 
 function m.onConnected(client)
     m.connected = true
-    log.log(5, MODULE, 'connected to ' .. m.host .. ':' .. m.port)
+    log.log(5, MODULE, 'connected to ' .. config.data['mqtt_host'] .. ':' .. config.data['mqtt_port'])
     if ready ~= nil then ready = ready - 1 end
     m.client:subscribe(m.prefix .. "/ping", 0)
     m.client:subscribe(m.prefix .. "/config", 0)
@@ -53,7 +49,7 @@ m.client:on("message", function(client, t, pl)
         m.send_status()
     elseif config ~= nil and t == m.prefix .. "/config" then
         if (pl == "ping") then
-            local msg = sjson.encode(config.get())
+            local msg = sjson.encode(config.data)
             log.log(7, MODULE, "sending " .. m.prefix .. "/config/json: " .. msg)
             m.client:publish(m.prefix .. "/config/json", msg, 0, 0)
         elseif (pl == "restart") then
@@ -84,8 +80,8 @@ if m.STATUS_INTERVAL > 0 then
 end
 
 function m.connect()
-    log.log(9, MODULE, 'connecting to ' .. m.host .. ':' .. m.port)
-    m.client:connect(m.host, m.port, m.onConnected, m.onError)
+    log.log(9, MODULE, 'connecting to ' .. config.data['mqtt_host'] .. ':' .. config.data['mqtt_port'])
+    m.client:connect(config.data['mqtt_host'], config.data['mqtt_port'], m.onConnected, m.onError)
 end
 m.connect()
 

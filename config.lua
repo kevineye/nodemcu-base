@@ -1,13 +1,13 @@
 local MODULE = 'config'
 local log = require 'log'
 
-config = {}
+local config = {}
 config.data = {}
 config.filename = file.exists('config.json') and 'config.json' or 'config.default.json'
 
 if ready ~= nil then ready = ready + 1 end
 
-function config.read_json()
+function config.load()
     log.log(7, MODULE, 'loading config from ' .. config.filename)
     file.open(config.filename, "r")
     config.data = sjson.decode(file.read())
@@ -24,25 +24,17 @@ end
 
 function config.set(key, value)
     config.data[key] = value
-    config.save_json()
-    log.log(4, MODULE, "updated config " .. key .. " = " .. value)
+    log.log(4, MODULE, "updating config " .. key .. " = " .. value)
+    config.save()
 end
 
-function config.get(key)
-    if key == nil then
-        return config.data
-    else
-        return config.data[key]
-    end
-end
-
-function config.save_json()
+function config.save()
     file.remove(config.filename)
     file.open(config.filename, "w")
     file.write(sjson.encode(config.data))
     file.close()
 end
 
-config.read_json()
+config.load()
 
 return config

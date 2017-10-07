@@ -5,18 +5,17 @@ log.heap    = log.level >= 7
 
 log.log = function(level, module, message)
     if log.level < level then return end
-    local s, ts
+    local s = ''
+    local ts
+
     if localtime and localtime.initialized then
         ts = localtime.time()
     elseif rtctime then
         ts = rtctime.get()
     end
-
     if ts then
         local tm = rtctime.epoch2cal(ts)
         s = string.format("%02d:%02d:%02d", tm["hour"], tm["min"], tm["sec"])
-    else
-        s = ''
     end
 
     if log.heap then
