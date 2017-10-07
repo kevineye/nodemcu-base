@@ -1,11 +1,12 @@
 local MODULE = 'ifttt'
 local log = require 'log'
+local config = require 'config'
 
 local ifttt = {}
-ifttt.host = 'maker.ifttt.com'
-ifttt.port = 80
-ifttt.key = config.get("ifttt_key")
-ifttt.conn = nil
+ifttt.host  = 'maker.ifttt.com'
+ifttt.port  = 80
+ifttt.key   = config.data['ifttt_key']
+ifttt.conn  = nil
 
 ifttt.trigger = function(event, value1, value2, value3)
     log.log(5, MODULE, 'triggering "' .. event .. '"')
@@ -16,14 +17,14 @@ ifttt.trigger = function(event, value1, value2, value3)
     log.log(7, MODULE, "POSTing to http://" .. ifttt.host .. ":" .. ifttt.port .. "/trigger/" .. event .. "/with/key/" .. ifttt.key)
     conn:connect(ifttt.port, ifttt.host)
 
-    conn:on("connection", function(conn, payload)
+    conn:on("connection", function(conn, _)
         log.log(9, MODULE, "connected")
 
         local d = {}
         if value1 then d.value1 = value1 end
         if value2 then d.value2 = value2 end
         if value3 then d.value3 = value3 end
-        local body = cjson.encode(d)
+        local body = sjson.encode(d)
 
         conn:send("POST /trigger/" .. event .. "/with/key/" .. ifttt.key
             .. " HTTP/1.1\r\n"
@@ -38,17 +39,6 @@ ifttt.trigger = function(event, value1, value2, value3)
         )
     end)
 
---    conn:on("sent", function()
---        log.log(9, MODULE, "finished sending")
---    end)
---
---    conn:on("receive", function(c, body)
---        log.log(7, MODULE, "received: " .. body)
---    end)
---
---    conn:on("disconnection", function()
---        log.log(9, MODULE, "disconnected")
---    end)
 end
 
 return ifttt
